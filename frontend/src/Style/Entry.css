@@ -1,0 +1,132 @@
+/* ---------------- */
+/* Large boxes      */
+/* ---------------- */
+
+.content-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    margin-bottom: 25px;
+}
+
+.large-box {
+    height: 340px;
+
+    border: 2px solid #333;
+    border-radius: 45px;
+
+    padding: 25px;
+}
+
+.large-box h2 {
+    text-align: center;
+
+    font-size: 27px;
+    font-weight: 400;
+}
+
+.chart-placeholder {
+    height: 230px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 20px;
+    opacity: 0.5;
+}
+
+.entries {
+    margin-top: 35px;
+
+    text-align: center;
+    font-size: 20px;
+    opacity: 0.5;
+}
+
+
+/* ---------------- */
+/* New Entry Button */
+/* ---------------- */
+
+.new-entry-btn {
+    display: block;
+
+    width: 280px;
+    height: 55px;
+
+    margin: 0 auto;
+
+    border: none;
+    border-radius: 35px;
+
+    background-color: #add0f8;
+
+    font-family: inherit;
+    font-size: 30px;
+
+    cursor: pointer;
+}
+
+.new-entry-btn:hover {
+    background-color: #9fc5ef;
+}
+
+.new-entry-btn:active {
+    transform: scale(0.98);
+}
+
+
+
+/* === WASTE ENTRY PAGE === */
+.waste-form-container {
+    width: 100%;
+    max-width: 700px;
+    background-color: #ffffff;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-top: 25px;
+}
+
+.waste-form {
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    font-size: 17px;
+    font-weight: bold;
+    color: #5a3e2b;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1px solid #d8c8b8;
+    border-radius: 7px;
+    background-color: #fffaf5;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    color: #5a3e2b;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #8b5e3c;
+    box-shadow: 0 0 0 2px rgba(139, 94, 60, 0.12);
+}
+
+.form-group input::placeholder {
+    color: #9a8a7c;
+}

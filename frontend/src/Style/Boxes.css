@@ -1,0 +1,57 @@
+.stat-box {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 190px;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    padding: clamp(19px, 2.2vw, 27px);
+    overflow: hidden;
+    border: 1px solid #eadfd3;
+    border-radius: 20px;
+    background: #fff;
+    color: #332a24;
+    box-shadow: 0 5px 18px rgba(80, 55, 35, 0.045);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.stat-box::after {
+    position: absolute;
+    right: -28px;
+    bottom: -62px;
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(139, 94, 60, 0.08);
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+}
+
+.home-stat-link:hover .stat-box {
+    transform: translateY(-3px);
+    border-color: #d3bdab;
+    box-shadow: 0 12px 28px rgba(80, 55, 35, 0.09);
+}
+
+.home-stat-link:focus-visible { outline: 3px solid #ba8d69; outline-offset: 4px; border-radius: 21px; }
+.stat-box-heading { display: flex; min-width: 0; align-items: center; gap: 10px; }
+.stat-box-heading h3 { min-width: 0; margin: 0; color: #65584d; font-size: 15px; font-weight: 600; }
+.stat-box-indicator { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: #9b7657; }
+.stat-box-plastic .stat-box-indicator { background: #6f9c83; }
+.stat-box-food .stat-box-indicator { background: #c9975b; }
+.stat-box-other .stat-box-indicator { background: #8991a3; }
+.stat-box-arrow { margin-left: auto; color: #a08c7b; font-size: 18px; transition: transform 180ms ease; }
+.home-stat-link:hover .stat-box-arrow { transform: translate(2px, -2px); }
+.stat-box-value { display: flex; align-items: baseline; gap: 8px; margin: auto 0 0; color: #332a24; font-size: clamp(36px, 4vw, 48px); font-weight: 650; letter-spacing: -1.8px; line-height: 1; }
+.stat-box-value span { color: #9a8979; font-size: 14px; font-weight: 500; letter-spacing: 0; }
+.stat-box-description { color: #86776b; font-size: 13px; line-height: 1.4; }
+
+@media (max-width: 700px) {
+    .stat-box { min-height: 160px; gap: 14px; border-radius: 17px; }
+    .stat-box-value { font-size: clamp(32px, 8vw, 42px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stat-box, .stat-box-arrow { transition: none; }
+}

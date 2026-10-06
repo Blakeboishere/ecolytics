@@ -1,0 +1,217 @@
+
+/* =========================
+   Global Reset
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   Navbar
+========================= */
+
+.navbar {
+    width: 100%;
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 55px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border-bottom: 1px solid #eadfd3;
+
+    box-shadow: 0 5px 20px rgba(80, 55, 35, 0.07);
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+
+/* =========================
+   Logo
+========================= */
+
+.logo {
+    font-size: 28px;
+    font-weight: 600;
+
+    letter-spacing: -0.5px;
+
+    color: #332a24;
+
+    cursor: pointer;
+
+    transition: color 0.25s ease;
+}
+
+.logo:hover {
+    color: #8b5e3c;
+}
+
+
+/* =========================
+   Navigation Links
+========================= */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.nav-links a {
+    position: relative;
+
+    text-decoration: none;
+
+    color: #5f5147;
+
+    font-size: 16px;
+    font-weight: 500;
+
+    padding: 11px 16px;
+
+    border-radius: 12px;
+
+    transition:
+        color 0.25s ease,
+        background-color 0.25s ease,
+        transform 0.2s ease;
+}
+
+
+/* Hover */
+
+.nav-links a:hover {
+    color: #6f472d;
+
+    background-color: #f8eee3;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   Active Link
+========================= */
+
+.nav-links a.active {
+    color: #ffffff;
+
+    background-color: #8b5e3c;
+
+    box-shadow: 0 5px 12px rgba(139, 94, 60, 0.20);
+}
+
+
+/* =========================
+   Logout Button
+========================= */
+
+.nav-links .logout {
+    margin-left: 8px;
+
+    color: #ffffff;
+
+    background-color: #8b5e3c;
+
+    padding: 11px 20px;
+
+    border-radius: 14px;
+
+    box-shadow: 0 5px 12px rgba(139, 94, 60, 0.18);
+}
+
+
+.nav-links .logout:hover {
+    color: #ffffff;
+
+    background-color: #6f472d;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 18px rgba(111, 71, 45, 0.25);
+}
+.nav-account-name {
+    margin-left: 8px;
+    color: #756558;
+    font-size: 14px;
+}
+
+.nav-logout {
+    border: 0;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+
+/* =========================
+   Mobile / Tablet
+========================= */
+
+@media (max-width: 850px) {
+
+    .navbar {
+        height: auto;
+
+        padding: 18px 25px;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .nav-links {
+        width: 100%;
+
+        justify-content: center;
+
+        flex-wrap: wrap;
+    }
+
+    .nav-links a {
+        font-size: 15px;
+
+        padding: 9px 12px;
+    }
+
+    .nav-links .logout {
+        margin-left: 0;
+    }
+
+    .nav-account-name { margin-left: 0; }
+}
+
+
+@media (max-width: 500px) {
+
+    .navbar {
+        padding: 16px 15px;
+    }
+
+    .logo {
+        font-size: 25px;
+    }
+
+    .nav-links {
+        gap: 5px;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+
+        padding: 8px 10px;
+    }
+}

@@ -22,8 +22,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
+    implementation 'org.springframework.security:spring-security-crypto'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     compileOnly 'org.projectlombok:lombok'
@@ -32,13 +31,40 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+def frontendDir = layout.projectDirectory.dir('frontend')
+def npmCommand = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
+
+tasks.register('npmInstall', Exec) {
+    workingDir frontendDir
+    commandLine npmCommand, 'ci'
+    inputs.file(frontendDir.file('package.json'))
+    inputs.file(frontendDir.file('package-lock.json'))
+    outputs.dir(frontendDir.dir('node_modules'))
+}
+
+tasks.register('buildFrontend', Exec) {
+    dependsOn 'npmInstall'
+    workingDir frontendDir
+    commandLine npmCommand, 'run', 'build'
+    inputs.dir(frontendDir.dir('src'))
+    inputs.dir(frontendDir.dir('public'))
+    inputs.file(frontendDir.file('index.html'))
+    inputs.file(frontendDir.file('vite.config.js'))
+    outputs.dir(frontendDir.dir('dist'))
+}
+
+tasks.named('processResources') {
+    dependsOn 'buildFrontend'
+    from(frontendDir.dir('dist')) {
+        into 'static'
+    }
 }
 
 tasks.named('test') {

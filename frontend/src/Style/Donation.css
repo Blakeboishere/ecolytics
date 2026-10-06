@@ -1,0 +1,455 @@
+/* =========================
+   GENERAL
+========================= */
+
+body {
+    margin: 0;
+    background-color: #f8eee3;
+    color: #3f3026;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.donation-hero {
+    min-height: 430px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 60px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #8b5e3c,
+        #6f472d
+    );
+
+    color: white;
+}
+
+.hero-content {
+    max-width: 750px;
+}
+
+.hero-tag {
+    display: inline-block;
+
+    font-size: 14px;
+    letter-spacing: 2px;
+    font-weight: bold;
+
+    margin-bottom: 15px;
+
+    opacity: 0.9;
+}
+
+.hero-content h1 {
+    font-size: 52px;
+    line-height: 1.15;
+
+    margin: 0 0 20px;
+}
+
+.hero-content h1 span {
+    color: #f8d9b5;
+}
+
+.hero-content p {
+    font-size: 19px;
+    line-height: 1.7;
+
+    margin-bottom: 30px;
+
+    opacity: 0.95;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.hero-btn,
+.donate-btn {
+    border: none;
+    cursor: pointer;
+
+    font-family: inherit;
+    font-weight: bold;
+
+    transition: 0.3s ease;
+}
+
+.hero-btn {
+    padding: 13px 28px;
+
+    border-radius: 7px;
+
+    background-color: #ffffff;
+    color: #6f472d;
+
+    font-size: 17px;
+}
+
+.hero-btn:hover {
+    transform: translateY(-2px);
+}
+
+
+/* =========================
+   SECTION HEADING
+========================= */
+
+.section-heading {
+    text-align: center;
+
+    max-width: 700px;
+
+    margin: 0 auto 45px;
+}
+
+.section-heading > span {
+    font-size: 13px;
+
+    letter-spacing: 2px;
+
+    font-weight: bold;
+
+    color: #8b5e3c;
+}
+
+.section-heading h2 {
+    font-size: 36px;
+
+    margin: 10px 0 15px;
+
+    color: #4a3427;
+}
+
+.section-heading p {
+    font-size: 17px;
+
+    line-height: 1.6;
+
+    color: #756558;
+}
+
+
+/* =========================
+   DONATION INTRO
+========================= */
+
+.donation-intro {
+    padding: 75px 8%;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.donation-stats {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 20px;
+
+    max-width: 1100px;
+
+    margin: auto;
+}
+
+.donation-stat {
+    background-color: white;
+
+    text-align: center;
+
+    padding: 30px 20px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+.donation-stat h3 {
+    font-size: 30px;
+
+    color: #8b5e3c;
+
+    margin: 0 0 8px;
+}
+
+.donation-stat p {
+    margin: 0;
+
+    font-size: 16px;
+
+    color: #756558;
+}
+
+
+/* =========================
+   HOW IT WORKS
+========================= */
+
+.how-section {
+    padding: 75px 8%;
+
+    background-color: #fffaf5;
+}
+
+.steps-container {
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.step-card {
+    background-color: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    border: 1px solid #eadbcd;
+}
+
+.step-number {
+    font-size: 30px;
+
+    font-weight: bold;
+
+    color: #8b5e3c;
+
+    margin-bottom: 15px;
+}
+
+.step-card h3 {
+    font-size: 22px;
+
+    margin: 0 0 10px;
+}
+
+.step-card p {
+    color: #756558;
+
+    line-height: 1.6;
+
+    font-size: 16px;
+}
+
+
+/* =========================
+   NGO SECTION
+========================= */
+
+.ngo-section {
+    padding: 75px 8%;
+}
+
+.ngo-container {
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.ngo-card {
+    background-color: white;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+
+    transition: 0.3s ease;
+}
+
+.ngo-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+/* NGO image placeholder */
+
+.ngo-image {
+    height: 160px;
+
+    background-color: #ead5c0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.ngo-placeholder {
+    font-size: 30px;
+
+    font-weight: bold;
+
+    color: #8b5e3c;
+}
+
+
+/* NGO content */
+
+.ngo-content {
+    padding: 25px;
+}
+
+.ngo-category {
+    font-size: 12px;
+
+    letter-spacing: 1px;
+
+    font-weight: bold;
+
+    color: #8b5e3c;
+}
+
+.ngo-content h3 {
+    font-size: 23px;
+
+    margin: 10px 0;
+}
+
+.ngo-content p {
+    color: #756558;
+
+    line-height: 1.5;
+
+    min-height: 75px;
+}
+
+.ngo-info {
+    display: flex;
+
+    justify-content: space-between;
+
+    font-size: 14px;
+
+    color: #756558;
+
+    margin: 20px 0;
+}
+
+
+/* Donate button */
+
+.donate-btn {
+    width: 100%;
+
+    padding: 13px;
+
+    border-radius: 7px;
+
+    background-color: #8b5e3c;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+.donate-btn:hover {
+    background-color: #6f472d;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================
+   FINAL CTA
+========================= */
+
+.donation-cta {
+    padding: 70px 20px;
+
+    text-align: center;
+
+    background-color: #6f472d;
+
+    color: white;
+}
+
+.donation-cta h2 {
+    font-size: 36px;
+
+    margin: 0 0 15px;
+}
+
+.donation-cta p {
+    max-width: 650px;
+
+    margin: 0 auto 25px;
+
+    line-height: 1.6;
+
+    font-size: 17px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+    .donation-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .steps-container {
+        grid-template-columns: 1fr;
+    }
+
+    .ngo-container {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+
+    .hero-content h1 {
+        font-size: 42px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .donation-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .donation-hero {
+        min-height: 380px;
+    }
+
+    .hero-content h1 {
+        font-size: 34px;
+    }
+
+    .section-heading h2 {
+        font-size: 29px;
+    }
+}
