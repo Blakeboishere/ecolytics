@@ -31,11 +31,15 @@ export const Profile = ({ account, onAccountUpdated }) => {
         return () => { active = false; };
     }, []);
 
-    useEffect(() => {
-        setPhone(account.phone || '');
-        setOrganization(account.organization || '');
-        setLocation(account.location || '');
-    }, [account]);
+    function toggleEditing() {
+        if (!editing) {
+            setPhone(account.phone || '');
+            setOrganization(account.organization || '');
+            setLocation(account.location || '');
+        }
+        setProfileError('');
+        setEditing(!editing);
+    }
 
     async function saveProfile(event) {
         event.preventDefault();
@@ -80,7 +84,7 @@ export const Profile = ({ account, onAccountUpdated }) => {
                     <p>Ecolytics account</p>
                     <span>{account.email}</span>
                 </div>
-                <button className="edit-profile-btn" type="button" onClick={() => { setEditing((value) => !value); setProfileError(''); }}>
+                <button className="edit-profile-btn" type="button" onClick={toggleEditing}>
                     {editing ? 'Cancel editing' : 'Edit profile'}
                 </button>
             </section>
