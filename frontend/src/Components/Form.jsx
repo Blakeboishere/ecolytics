@@ -1,11 +1,55 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export const Form = () => {
+    const [remnantType, setRemnantType] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-    const [remnantType, setRemnantType] = useState("");
+    async function submitEntry(event) {
+        event.preventDefault();
+        setError('');
+        setSuccess('');
+        setSaving(true);
+
+        const form = event.currentTarget;
+        const values = new FormData(form);
+        const kind = values.get('waste-type');
+        const request = {
+            weight: Number(values.get('weight')),
+            remnantType: kind,
+            itemName: values.get(kind === 'food' ? 'food-name' : 'waste-name'),
+            category: values.get(kind === 'food' ? 'food-category' : 'waste-category'),
+            mealType: kind === 'food' ? values.get('meal-type') : null,
+        };
+
+        try {
+            const response = await fetch('/api/remnants', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request),
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({}));
+                if (response.status === 401) {
+                    setError('Your session has expired. Log in again, then submit this entry.');
+                } else {
+                    setError(result.detail || 'The entry could not be saved. Check the details and try again.');
+                }
+                return;
+            }
+            form.reset();
+            setRemnantType('');
+            setSuccess('Remnant entry saved.');
+        } catch {
+            setError('Could not connect to Ecolytics. Check that the app is running and try again.');
+        } finally {
+            setSaving(false);
+        }
+    }
 
     return (
-        <form className="waste-form">
+        <form className="waste-form" onSubmit={submitEntry}>
             <div className="form-group">
                 <label htmlFor="weight">
                     Estimated / Exact Weight (kg)
@@ -17,7 +61,7 @@ export const Form = () => {
                     name="weight"
                     placeholder="Enter weight in kg"
                     step="0.01"
-                    min="0"
+                    min="0.01"
                     required
                 />
             </div>
@@ -163,11 +207,15 @@ export const Form = () => {
                 </>
             )}
 
+            {error && <p className="form-feedback form-feedback-error" role="alert">{error}</p>}
+            {success && <p className="form-feedback form-feedback-success" role="status">{success}</p>}
+
             <button
                 type="submit"
                 className="new-entry-btn"
+                disabled={saving}
             >
-                Submit
+                {saving ? 'Saving…' : 'Save entry'}
             </button>
 
         </form>

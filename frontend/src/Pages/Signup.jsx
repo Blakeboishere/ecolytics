@@ -5,6 +5,9 @@ export function Signup() {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [location, setLocation] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +25,7 @@ export function Signup() {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, password }),
+        body: JSON.stringify({ fullName, email, password, phone, organization, location }),
       });
       if (response.status === 409) {
         setError('An account with this email already exists. Log in instead.');
@@ -53,6 +56,12 @@ export function Signup() {
           <input id="signup-name" type="text" autoComplete="name" maxLength="100" required value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Your name" />
           <label htmlFor="signup-email">Email address</label>
           <input id="signup-email" type="email" autoComplete="email" maxLength="254" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
+          <label htmlFor="signup-phone">Phone number <span>(optional)</span></label>
+          <input id="signup-phone" type="tel" autoComplete="tel" maxLength="30" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Your contact number" />
+          <label htmlFor="signup-organization">Organization <span>(optional)</span></label>
+          <input id="signup-organization" type="text" autoComplete="organization" maxLength="120" value={organization} onChange={(event) => setOrganization(event.target.value)} placeholder="Your organization" />
+          <label htmlFor="signup-location">Location <span>(optional)</span></label>
+          <input id="signup-location" type="text" autoComplete="address-level2" maxLength="120" value={location} onChange={(event) => setLocation(event.target.value)} placeholder="City, region" />
           <label htmlFor="signup-password">Password</label>
           <input id="signup-password" type="password" autoComplete="new-password" minLength="8" maxLength="72" required value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" />
           <label htmlFor="signup-confirm-password">Confirm password</label>

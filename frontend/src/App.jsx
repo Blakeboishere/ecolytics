@@ -44,7 +44,7 @@ function App() {
         <Route path="/" element={<ProtectedRoute account={account} checking={checking}><Home user={account?.fullName} /></ProtectedRoute>} />
         <Route path="/remnant-entry" element={<ProtectedRoute account={account} checking={checking}><Entry /></ProtectedRoute>} />
         <Route path="/donate" element={<ProtectedRoute account={account} checking={checking}><Donate /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute account={account} checking={checking}><Profile account={account} /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute account={account} checking={checking}><Profile account={account} onAccountUpdated={setAccount} /></ProtectedRoute>} />
         <Route path="/waste/:type" element={<ProtectedRoute account={account} checking={checking}><WasteDetails /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

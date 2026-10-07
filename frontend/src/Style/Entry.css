@@ -53,25 +53,27 @@
 .new-entry-btn {
     display: block;
 
-    width: 280px;
-    height: 55px;
-
-    margin: 0 auto;
+    min-width: 180px;
+    min-height: 48px;
+    margin: 4px 0 0 auto;
 
     border: none;
-    border-radius: 35px;
+    border-radius: 10px;
 
-    background-color: #add0f8;
+    background-color: #8b5e3c;
 
     font-family: inherit;
-    font-size: 30px;
+    font-size: 16px;
+    font-weight: 600;
 
     cursor: pointer;
 }
 
 .new-entry-btn:hover {
-    background-color: #9fc5ef;
+    background-color: #6f472d;
 }
+
+.new-entry-btn:disabled { cursor: wait; opacity: 0.7; }
 
 .new-entry-btn:active {
     transform: scale(0.98);
@@ -82,13 +84,19 @@
 /* === WASTE ENTRY PAGE === */
 .waste-form-container {
     width: 100%;
-    max-width: 700px;
     background-color: #ffffff;
-    padding: 35px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    margin-top: 25px;
+    padding: clamp(22px, 4vw, 38px);
+    border: 1px solid #eadfd3;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(80, 55, 35, 0.07);
+    margin-top: 0;
 }
+
+.entry-page { width: min(100% - 40px, 720px); min-height: calc(100vh - 76px); margin: 0 auto; padding: clamp(32px, 5vw, 58px) 0 60px; }
+.entry-heading { margin-bottom: 24px; }
+.entry-eyebrow { margin-bottom: 10px; color: #8b5e3c; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; }
+.entry-heading h1 { margin: 0; color: #332a24; font-size: clamp(29px, 4vw, 40px); font-weight: 600; letter-spacing: -1px; }
+.entry-heading > p:last-child { max-width: 580px; margin-top: 10px; color: #756558; font-size: 15px; line-height: 1.6; }
 
 .waste-form {
     width: 100%;
@@ -129,4 +137,14 @@
 
 .form-group input::placeholder {
     color: #9a8a7c;
+}
+
+.form-feedback { margin: 2px 0 18px; padding: 12px 14px; border-radius: 9px; font-size: 14px; line-height: 1.5; }
+.form-feedback-error { background: #fff0ed; color: #9c3526; }
+.form-feedback-success { background: #edf7ed; color: #386943; }
+
+@media (max-width: 560px) {
+    .entry-page { width: min(100% - 28px, 720px); padding-top: 28px; }
+    .waste-form-container { padding: 21px 17px; border-radius: 15px; }
+    .new-entry-btn { width: 100%; }
 }

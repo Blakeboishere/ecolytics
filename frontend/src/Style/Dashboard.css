@@ -80,6 +80,20 @@
 .home-text-action { display: inline-flex; align-items: center; gap: 7px; color: #6f472d; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .home-text-action:hover { color: #4f311e; }
 
+.data-feedback { color: #9b3c32; }
+.data-page { width: min(100% - 56px, 1160px); min-height: calc(100vh - 76px); margin: 0 auto; padding: clamp(32px, 5vw, 62px) 0 56px; color: #332a24; font-family: "Segoe UI", system-ui, sans-serif; }
+.data-page-header { margin-bottom: 26px; }
+.data-page-header h1 { margin: 0; color: #302822; font-size: clamp(30px, 4vw, 42px); font-weight: 600; letter-spacing: -1.2px; }
+.data-page-header > p:last-child { color: #756558; }
+.data-table-card { overflow: hidden; border: 1px solid rgba(120, 90, 60, 0.1); border-radius: 20px; background: #fff; box-shadow: 0 12px 32px rgba(80, 55, 35, 0.055); }
+.data-table-summary { display: flex; justify-content: space-between; gap: 16px; padding: 19px 22px; color: #756558; }
+.data-table-summary strong { color: #6f472d; }
+.data-table-scroll { overflow-x: auto; }
+.data-table { width: 100%; min-width: 780px; border-collapse: collapse; }
+.data-table th { padding: 14px 18px; background: #f8eee3; color: #5a3e2b; text-align: left; font-size: 13px; }
+.data-table td { padding: 15px 18px; border-top: 1px solid #eee2d7; color: #5f5147; font-size: 14px; }
+.data-table-empty { text-align: center; }
+
 @media (max-width: 960px) {
     .home-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .home-next-step { grid-template-columns: auto minmax(0, 1fr); }
@@ -87,6 +101,7 @@
 }
 
 @media (max-width: 640px) {
+    .data-page { width: min(100% - 32px, 520px); padding-top: 30px; }
     .home-dashboard { width: min(100% - 32px, 520px); padding-top: 30px; }
     .home-welcome { align-items: stretch; flex-direction: column; gap: 22px; margin-bottom: 26px; }
     .home-primary-action { width: 100%; }
