@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams} from 'react-router-dom';
+import { useParams, useNavigate} from 'react-router-dom';
 import '../Style/Dashboard.css';
 
 function formatDate(value) {
@@ -23,7 +23,7 @@ export const WasteDetails = () => {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
-
+  const navigate = useNavigate();
   const visibleEntries = useMemo(() => {
     const selected = decodeURIComponent(type).toLowerCase();
     if (selected === 'total') return entries;
@@ -70,7 +70,7 @@ export const WasteDetails = () => {
                     <td>{entry.mealType ? entry.mealType === 'non-veg' ? 'Non-vegetarian' : 'Vegetarian' : '—'}</td>
                     <td>{Number(entry.weight).toFixed(2)} kg</td>
                     <td>{formatDate(entry.createdAt)}</td>
-                    <td><button className='tableBtn' onClick={() => {console.log("updated")}}>✏️</button></td>
+                    <td><button className='tableBtn' onClick={() => navigate(`/update/${entry.id}`)}>✏️</button></td>
                     <td><button className='tableBtn' onClick={() => deleteWaste(entry.id)}>🗑️</button></td>
                   </tr>
                 ))}

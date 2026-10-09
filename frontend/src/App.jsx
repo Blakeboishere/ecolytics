@@ -10,6 +10,7 @@ import { Profile } from './Pages/Profile';
 import { WasteDetails } from './Pages/WasteDetails';
 import { Login } from './Pages/Login';
 import { Signup } from './Pages/Signup';
+import {UpdatePage} from "./Pages/UpdatePage.jsx";
 
 function ProtectedRoute({ account, checking, children }) {
   if (checking) return <main className="auth-loading">Loading your account…</main>;
@@ -46,6 +47,7 @@ function App() {
         <Route path="/donate" element={<ProtectedRoute account={account} checking={checking}><Donate /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute account={account} checking={checking}><Profile account={account} onAccountUpdated={setAccount} /></ProtectedRoute>} />
         <Route path="/waste/:type" element={<ProtectedRoute account={account} checking={checking}><WasteDetails /></ProtectedRoute>} />
+        <Route path="/update/:id" element={<ProtectedRoute account={account} checking={checking}><UpdatePage/></ProtectedRoute>}/>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

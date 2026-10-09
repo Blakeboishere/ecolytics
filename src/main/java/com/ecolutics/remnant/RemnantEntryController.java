@@ -66,6 +66,30 @@ public class RemnantEntryController {
                 .toList();
     }
 
+    @GetMapping("/{id}")
+    public EntryResponse getEntryById(
+            @PathVariable Long id,
+            HttpServletRequest servletRequest) {
+
+        String ownerEmail = AccountSession.requireEmail(servletRequest);
+
+        RemnantEntry entry = entries.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Remnant entry not found"));
+
+        if (!entry.getOwnerEmail().equals(ownerEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot access this entry");
+        }
+
+        return EntryResponse.from(entry);
+    }
+
+
+
     private static String requireValue(String value, String message) {
         if (value == null || value.isBlank()) {
             throw badRequest(message);
