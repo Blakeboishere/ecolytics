@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate} from 'react-router-dom';
 import '../Style/Dashboard.css';
 
 function formatDate(value) {
@@ -11,7 +11,6 @@ export const WasteDetails = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   useEffect(() => {
     let active = true;
     fetch('/api/remnants')
@@ -24,7 +23,7 @@ export const WasteDetails = () => {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
-
+  const navigate = useNavigate();
   const visibleEntries = useMemo(() => {
     const selected = decodeURIComponent(type).toLowerCase();
     if (selected === 'total') return entries;
@@ -34,7 +33,16 @@ export const WasteDetails = () => {
 
   const title = decodeURIComponent(type);
   const total = visibleEntries.reduce((sum, entry) => sum + Number(entry.weight || 0), 0);
-
+  const deleteWaste = async(id) => {
+    const response = await fetch(`/api/remnants/${id}`,{
+      method: 'DELETE'
+    });
+    if(response.ok){
+      window.location.reload();
+    } else{
+      setError("Error 404!");
+    }
+  }
   return (
     <main className="data-page">
       <header className="data-page-header">
@@ -52,7 +60,7 @@ export const WasteDetails = () => {
           </div>
           <div className="data-table-scroll">
             <table className="data-table">
-              <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Meal</th><th>Weight</th><th>Recorded</th></tr></thead>
+              <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Meal</th><th>Weight</th><th>Recorded</th><th>Update</th><th>Delete</th></tr></thead>
               <tbody>
                 {visibleEntries.map((entry) => (
                   <tr key={entry.id}>
@@ -62,6 +70,8 @@ export const WasteDetails = () => {
                     <td>{entry.mealType ? entry.mealType === 'non-veg' ? 'Non-vegetarian' : 'Vegetarian' : '—'}</td>
                     <td>{Number(entry.weight).toFixed(2)} kg</td>
                     <td>{formatDate(entry.createdAt)}</td>
+                    <td><button className='tableBtn' onClick={() => navigate(`/update/${entry.id}`)}>✏️</button></td>
+                    <td><button className='tableBtn' onClick={() => deleteWaste(entry.id)}>🗑️</button></td>
                   </tr>
                 ))}
                 {visibleEntries.length === 0 && <tr><td className="data-table-empty" colSpan="6">No matching entries yet. Add a remnant entry to see it here.</td></tr>}

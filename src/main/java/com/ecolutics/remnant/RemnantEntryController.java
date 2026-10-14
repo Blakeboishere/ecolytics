@@ -14,11 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Receives remnant requests from React and connects them to persistence. */
@@ -70,6 +66,30 @@ public class RemnantEntryController {
                 .toList();
     }
 
+    @GetMapping("/{id}")
+    public EntryResponse getEntryById(
+            @PathVariable Long id,
+            HttpServletRequest servletRequest) {
+
+        String ownerEmail = AccountSession.requireEmail(servletRequest);
+
+        RemnantEntry entry = entries.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Remnant entry not found"));
+
+        if (!entry.getOwnerEmail().equals(ownerEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot access this entry");
+        }
+
+        return EntryResponse.from(entry);
+    }
+
+
+
     private static String requireValue(String value, String message) {
         if (value == null || value.isBlank()) {
             throw badRequest(message);
@@ -104,4 +124,29 @@ public class RemnantEntryController {
                     entry.getItemName(), entry.getCategory(), entry.getMealType(), entry.getCreatedAt());
         }
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEntry(
+            @PathVariable Long id,
+            HttpServletRequest servletRequest) {
+
+        String ownerEmail = AccountSession.requireEmail(servletRequest);
+
+        RemnantEntry entry = entries.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Remnant entry not found"));
+
+        // Make sure the user can delete only their own entry
+        if (!entry.getOwnerEmail().equals(ownerEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot delete this entry");
+        }
+
+        entries.delete(entry);
+
+        return ResponseEntity.noContent().build();
+    }
 }
+
