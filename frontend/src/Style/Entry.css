@@ -142,9 +142,13 @@
 .form-feedback { margin: 2px 0 18px; padding: 12px 14px; border-radius: 9px; font-size: 14px; line-height: 1.5; }
 .form-feedback-error { background: #fff0ed; color: #9c3526; }
 .form-feedback-success { background: #edf7ed; color: #386943; }
+.update-form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 22px; }
+.update-form-actions .new-entry-btn { margin: 4px 0 0; padding: 0 20px; color: #fff; }
 
 @media (max-width: 560px) {
     .entry-page { width: min(100% - 28px, 720px); padding-top: 28px; }
     .waste-form-container { padding: 21px 17px; border-radius: 15px; }
     .new-entry-btn { width: 100%; }
+    .update-form-actions { align-items: stretch; flex-direction: column-reverse; gap: 14px; }
+    .update-form-actions .home-text-action { justify-content: center; }
 }
