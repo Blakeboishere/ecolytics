@@ -40,7 +40,7 @@ public class RemnantEntryController {
         EntryDetails details = validateAndNormalize(request);
         Instant createdAt = Instant.now();
         Instant donationExpiresAt = "food".equals(details.remnantType())
-                ? expiryService.deadlineFrom(createdAt)
+                ? expiryService.deadlineFrom(createdAt, details.category())
                 : null;
 
         // The owner comes from the server session, never from client-submitted JSON.
@@ -70,25 +70,50 @@ public class RemnantEntryController {
     }
 
     /** Replaces editable entry fields while keeping ownership and original creation time. */
+
     @PutMapping("/{id}")
     public EntryResponse updateEntry(
             @PathVariable Long id,
             @Valid @RequestBody CreateEntryRequest request,
             HttpServletRequest servletRequest) {
+
         String ownerEmail = AccountSession.requireEmail(servletRequest);
         expiryService.expireOverdueFood();
+
         RemnantEntry entry = requireOwnedEntry(id, ownerEmail);
         EntryDetails details = validateAndNormalize(request);
+
         Instant newDeadline = null;
+
         if ("food".equals(details.remnantType())) {
-            newDeadline = "food".equals(entry.getRemnantType()) && entry.getDonationExpiresAt() != null
-                    ? entry.getDonationExpiresAt()
-                    : expiryService.deadlineFrom(Instant.now());
+            boolean sameCategory =
+                    "food".equals(entry.getRemnantType())
+                            && details.category().equalsIgnoreCase(entry.getCategory());
+
+            if (sameCategory && entry.getDonationExpiresAt() != null) {
+                // Keep the existing deadline if the category hasn't changed.
+                newDeadline = entry.getDonationExpiresAt();
+            } else {
+                // Assign a new deadline based on the new food category.
+                newDeadline = expiryService.deadlineFrom(
+                        Instant.now(),
+                        details.category()
+                );
+            }
         }
-        entry.updateDetails(details.weight(), details.remnantType(), details.itemName(),
-                details.category(), details.mealType(), newDeadline);
+
+        entry.updateDetails(
+                details.weight(),
+                details.remnantType(),
+                details.itemName(),
+                details.category(),
+                details.mealType(),
+                newDeadline
+        );
+
         return EntryResponse.from(entries.save(entry));
     }
+
 
     private static String requireValue(String value, String message) {
         if (value == null || value.isBlank()) {
