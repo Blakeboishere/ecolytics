@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class RemnantEntryController {
 
     private final RemnantEntryRepository entries;
+    private final RemnantExpiryService expiryService;
 
-    public RemnantEntryController(RemnantEntryRepository entries) {
+    public RemnantEntryController(RemnantEntryRepository entries, RemnantExpiryService expiryService) {
         this.entries = entries;
+        this.expiryService = expiryService;
     }
 
     /** Validates a submitted entry, assigns it to the signed-in user, and saves it. */
@@ -34,6 +37,80 @@ public class RemnantEntryController {
             @Valid @RequestBody CreateEntryRequest request,
             HttpServletRequest servletRequest) {
         String ownerEmail = AccountSession.requireEmail(servletRequest);
+        EntryDetails details = validateAndNormalize(request);
+        Instant createdAt = Instant.now();
+        Instant donationExpiresAt = "food".equals(details.remnantType())
+                ? expiryService.deadlineFrom(createdAt)
+                : null;
+
+        // The owner comes from the server session, never from client-submitted JSON.
+        RemnantEntry saved = entries.save(new RemnantEntry(
+                ownerEmail, details.weight(), details.remnantType(), details.itemName(),
+                details.category(), details.mealType(), createdAt, donationExpiresAt));
+        return ResponseEntity.status(HttpStatus.CREATED).body(EntryResponse.from(saved));
+    }
+
+    /** Returns only the current user's entries, newest first. */
+    @GetMapping
+    public List<EntryResponse> listEntries(HttpServletRequest servletRequest) {
+        String ownerEmail = AccountSession.requireEmail(servletRequest);
+        expiryService.expireOverdueFood();
+        return entries.findAllByOwnerEmailOrderByCreatedAtDesc(ownerEmail).stream()
+                .map(EntryResponse::from)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public EntryResponse getEntryById(
+            @PathVariable Long id,
+            HttpServletRequest servletRequest) {
+        String ownerEmail = AccountSession.requireEmail(servletRequest);
+        expiryService.expireOverdueFood();
+        return EntryResponse.from(requireOwnedEntry(id, ownerEmail));
+    }
+
+    /** Replaces editable entry fields while keeping ownership and original creation time. */
+    @PutMapping("/{id}")
+    public EntryResponse updateEntry(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateEntryRequest request,
+            HttpServletRequest servletRequest) {
+        String ownerEmail = AccountSession.requireEmail(servletRequest);
+        expiryService.expireOverdueFood();
+        RemnantEntry entry = requireOwnedEntry(id, ownerEmail);
+        EntryDetails details = validateAndNormalize(request);
+        Instant newDeadline = null;
+        if ("food".equals(details.remnantType())) {
+            newDeadline = "food".equals(entry.getRemnantType()) && entry.getDonationExpiresAt() != null
+                    ? entry.getDonationExpiresAt()
+                    : expiryService.deadlineFrom(Instant.now());
+        }
+        entry.updateDetails(details.weight(), details.remnantType(), details.itemName(),
+                details.category(), details.mealType(), newDeadline);
+        return EntryResponse.from(entries.save(entry));
+    }
+
+    private static String requireValue(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw badRequest(message);
+        }
+        return value.trim();
+    }
+
+    private static ResponseStatusException badRequest(String message) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+    }
+
+    private RemnantEntry requireOwnedEntry(Long id, String ownerEmail) {
+        RemnantEntry entry = entries.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Remnant entry not found"));
+        if (!entry.getOwnerEmail().equals(ownerEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this entry");
+        }
+        return entry;
+    }
+
+    private static EntryDetails validateAndNormalize(CreateEntryRequest request) {
         String type = request.remnantType().toLowerCase(Locale.ROOT);
         String category = requireValue(request.category(), "Select a category");
         String itemName = requireValue(request.itemName(), "Enter a name for this remnant");
@@ -50,55 +127,11 @@ public class RemnantEntryController {
         } else if (!List.of("biodegradable", "non-biodegradable").contains(category)) {
             throw badRequest("Choose a valid waste type");
         }
-
-        // The owner comes from the server session, never from client-submitted JSON.
-        RemnantEntry saved = entries.save(new RemnantEntry(
-                ownerEmail, request.weight(), type, itemName, category, mealType));
-        return ResponseEntity.status(HttpStatus.CREATED).body(EntryResponse.from(saved));
+        return new EntryDetails(request.weight(), type, itemName, category, mealType);
     }
 
-    /** Returns only the current user's entries, newest first. */
-    @GetMapping
-    public List<EntryResponse> listEntries(HttpServletRequest servletRequest) {
-        String ownerEmail = AccountSession.requireEmail(servletRequest);
-        return entries.findAllByOwnerEmailOrderByCreatedAtDesc(ownerEmail).stream()
-                .map(EntryResponse::from)
-                .toList();
-    }
-
-    @GetMapping("/{id}")
-    public EntryResponse getEntryById(
-            @PathVariable Long id,
-            HttpServletRequest servletRequest) {
-
-        String ownerEmail = AccountSession.requireEmail(servletRequest);
-
-        RemnantEntry entry = entries.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Remnant entry not found"));
-
-        if (!entry.getOwnerEmail().equals(ownerEmail)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "You cannot access this entry");
-        }
-
-        return EntryResponse.from(entry);
-    }
-
-
-
-    private static String requireValue(String value, String message) {
-        if (value == null || value.isBlank()) {
-            throw badRequest(message);
-        }
-        return value.trim();
-    }
-
-    private static ResponseStatusException badRequest(String message) {
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+    private record EntryDetails(BigDecimal weight, String remnantType, String itemName,
+            String category, String mealType) {
     }
 
     /** JSON accepted from React; Bean Validation checks basic field shape and size. */
@@ -118,10 +151,12 @@ public class RemnantEntryController {
             String itemName,
             String category,
             String mealType,
-            java.time.Instant createdAt) {
+            java.time.Instant createdAt,
+            Instant donationExpiresAt) {
         private static EntryResponse from(RemnantEntry entry) {
             return new EntryResponse(entry.getId(), entry.getWeightKg(), entry.getRemnantType(),
-                    entry.getItemName(), entry.getCategory(), entry.getMealType(), entry.getCreatedAt());
+                    entry.getItemName(), entry.getCategory(), entry.getMealType(), entry.getCreatedAt(),
+                    entry.getDonationExpiresAt());
         }
     }
     @DeleteMapping("/{id}")
@@ -131,21 +166,7 @@ public class RemnantEntryController {
 
         String ownerEmail = AccountSession.requireEmail(servletRequest);
 
-        RemnantEntry entry = entries.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Remnant entry not found"));
-
-        // Make sure the user can delete only their own entry
-        if (!entry.getOwnerEmail().equals(ownerEmail)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "You cannot delete this entry");
-        }
-
-        entries.delete(entry);
-
+        entries.delete(requireOwnedEntry(id, ownerEmail));
         return ResponseEntity.noContent().build();
     }
 }

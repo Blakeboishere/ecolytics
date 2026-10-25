@@ -44,18 +44,45 @@ public class RemnantEntry {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "donation_expires_at")
+    private Instant donationExpiresAt;
+
     protected RemnantEntry() {
     }
 
     public RemnantEntry(String ownerEmail, BigDecimal weightKg, String remnantType,
-            String itemName, String category, String mealType) {
+            String itemName, String category, String mealType,
+            Instant createdAt, Instant donationExpiresAt) {
         this.ownerEmail = ownerEmail;
         this.weightKg = weightKg;
         this.remnantType = remnantType;
         this.itemName = itemName;
         this.category = category;
         this.mealType = mealType;
-        this.createdAt = Instant.now();
+        this.createdAt = createdAt;
+        this.donationExpiresAt = donationExpiresAt;
+    }
+
+    public void updateDetails(BigDecimal weightKg, String remnantType, String itemName,
+            String category, String mealType, Instant donationExpiresAt) {
+        this.weightKg = weightKg;
+        this.remnantType = remnantType;
+        this.itemName = itemName;
+        this.category = category;
+        this.mealType = mealType;
+        this.donationExpiresAt = donationExpiresAt;
+    }
+
+    public void setDonationExpiresAt(Instant donationExpiresAt) {
+        this.donationExpiresAt = donationExpiresAt;
+    }
+
+    /** Reclassifies an expired food listing while keeping its weight and history. */
+    public void moveExpiredFoodToWaste() {
+        this.remnantType = "waste";
+        this.itemName = "non-donatable food";
+        this.category = "biodegradable";
+        this.mealType = null;
     }
 
     public Long getId() {
@@ -88,6 +115,10 @@ public class RemnantEntry {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public Instant getDonationExpiresAt() {
+        return donationExpiresAt;
     }
 
 }

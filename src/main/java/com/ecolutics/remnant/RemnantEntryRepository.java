@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface RemnantEntryRepository extends JpaRepository<RemnantEntry, Long> {
     /** Spring Data filters by ownerEmail and sorts newest entries first from this method name. */
     List<RemnantEntry> findAllByOwnerEmailOrderByCreatedAtDesc(String ownerEmail);
+
+    List<RemnantEntry> findAllByRemnantTypeAndDonationExpiresAtLessThanEqual(String remnantType, java.time.Instant time);
+
+    List<RemnantEntry> findAllByRemnantTypeAndDonationExpiresAtIsNull(String remnantType);
 }
