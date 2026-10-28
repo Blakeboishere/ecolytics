@@ -1,6 +1,7 @@
 package com.ecolutics.remnant;
 
 import com.ecolutics.account.AccountSession;
+import com.ecolutics.account.UserAccountRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
@@ -25,10 +26,67 @@ public class RemnantEntryController {
 
     private final RemnantEntryRepository entries;
     private final RemnantExpiryService expiryService;
+    private final UserAccountRepository accounts;
 
-    public RemnantEntryController(RemnantEntryRepository entries, RemnantExpiryService expiryService) {
+    public RemnantEntryController(RemnantEntryRepository entries, RemnantExpiryService expiryService, UserAccountRepository accounts) {
         this.entries = entries;
         this.expiryService = expiryService;
+        this.accounts = accounts;
+    }
+
+    @GetMapping("/available")
+    public List<DonationListing> availableDonations(HttpServletRequest request) {
+        String email = AccountSession.requireEmail(request);
+        if (accounts.findByEmailIgnoreCase(email).map(a -> "ngo".equals(a.getAccountType())).orElse(false) == false)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "NGO accounts only");
+        expiryService.expireOverdueFood();
+        Instant now = Instant.now();
+        return entries.findAll().stream()
+            .filter(e -> ("food".equals(e.getRemnantType()) && e.getDonationExpiresAt() != null && e.getDonationExpiresAt().isAfter(now))
+                    || ("waste".equals(e.getRemnantType()) && "biodegradable".equals(e.getCategory())))
+            .sorted((left, right) -> {
+                Instant leftSort = left.getDonationExpiresAt() == null ? left.getCreatedAt() : left.getDonationExpiresAt();
+                Instant rightSort = right.getDonationExpiresAt() == null ? right.getCreatedAt() : right.getDonationExpiresAt();
+                return leftSort.compareTo(rightSort);
+            })
+            .map(e -> accounts.findByEmailIgnoreCase(e.getOwnerEmail()).map(a -> new DonationListing(e.getId(), e.getItemName(), e.getCategory(), e.getMealType(), e.getWeightKg(), e.getDonationExpiresAt(), a.getOrganization(), a.getLocation(), a.getPhone(), "food".equals(e.getRemnantType()) ? "food" : "compost", e.getClaimantEmail() != null, e.getClaimAccepted())).orElse(null))
+            .filter(java.util.Objects::nonNull).toList();
+    }
+
+    public record DonationListing(Long id, String itemName, String category, String mealType, BigDecimal weight,
+            Instant expiresAt, String canteen, String location, String phone, String donationType, boolean claimed, boolean claimAccepted) {}
+
+    @PostMapping("/{id}/claim")
+    public EntryResponse claimDonation(@PathVariable Long id, HttpServletRequest request) {
+        String email = AccountSession.requireEmail(request);
+        requireAccountType(email, "ngo");
+        expiryService.expireOverdueFood();
+        RemnantEntry entry = entries.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Food listing not found"));
+        boolean activeFood = "food".equals(entry.getRemnantType()) && entry.getDonationExpiresAt() != null && entry.getDonationExpiresAt().isAfter(Instant.now());
+        boolean compostWaste = "waste".equals(entry.getRemnantType()) && "biodegradable".equals(entry.getCategory());
+        if (!activeFood && !compostWaste)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This listing is no longer available");
+        if (entry.getClaimantEmail() != null)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This food listing has already been claimed");
+        entry.claim(email);
+        return EntryResponse.from(entries.save(entry));
+    }
+
+    @PostMapping("/{id}/accept-claim")
+    public EntryResponse acceptClaim(@PathVariable Long id, HttpServletRequest request) {
+        String email = AccountSession.requireEmail(request);
+        requireAccountType(email, "canteen");
+        RemnantEntry entry = requireOwnedEntry(id, email);
+        if (entry.getClaimantEmail() == null)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "No NGO has claimed this food");
+        if (entry.getClaimAccepted()) throw new ResponseStatusException(HttpStatus.CONFLICT, "This claim was already accepted");
+        entry.acceptClaim();
+        return EntryResponse.from(entries.save(entry));
+    }
+
+    private void requireAccountType(String email, String requiredType) {
+        if (!accounts.findByEmailIgnoreCase(email).map(account -> requiredType.equals(account.getAccountType())).orElse(false))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, requiredType + " accounts only");
     }
 
     /** Validates a submitted entry, assigns it to the signed-in user, and saves it. */
@@ -177,11 +235,13 @@ public class RemnantEntryController {
             String category,
             String mealType,
             java.time.Instant createdAt,
-            Instant donationExpiresAt) {
+            Instant donationExpiresAt,
+            String claimantEmail,
+            boolean claimAccepted) {
         private static EntryResponse from(RemnantEntry entry) {
             return new EntryResponse(entry.getId(), entry.getWeightKg(), entry.getRemnantType(),
                     entry.getItemName(), entry.getCategory(), entry.getMealType(), entry.getCreatedAt(),
-                    entry.getDonationExpiresAt());
+                    entry.getDonationExpiresAt(), entry.getClaimantEmail(), entry.getClaimAccepted());
         }
     }
     @DeleteMapping("/{id}")

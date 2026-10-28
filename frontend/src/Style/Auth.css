@@ -91,3 +91,10 @@
     .auth-card { padding: 30px 24px 26px; border-radius: 17px; }
     .auth-card h1 { font-size: 25px; }
 }
+.ngo-listings { display: grid; gap: 14px; }
+.ngo-listing { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 22px; border: 1px solid #eadfd3; border-radius: 16px; background: #fff; }
+.ngo-listing h3 { margin: 4px 0 8px; color: #332a24; font-size: 20px; }
+.ngo-listing p { margin: 5px 0; color: #756558; font-size: 14px; }
+.ngo-listing-contact { display: grid; justify-items: end; gap: 8px; }
+.auth-form select { margin-bottom: 17px; padding: 12px 14px; border: 1px solid #d8c8b8; border-radius: 9px; background: #fffaf5; color: #332a24; font: inherit; }
+@media (max-width: 650px) { .ngo-listing { align-items: flex-start; flex-direction: column; } .ngo-listing-contact { justify-items: start; } }

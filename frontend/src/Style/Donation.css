@@ -360,6 +360,7 @@ body {
 
 .donate-btn {
     width: 100%;
+    display: block;
 
     padding: 13px;
 
@@ -368,6 +369,8 @@ body {
     background-color: #8b5e3c;
 
     color: white;
+    text-align: center;
+    text-decoration: none;
 
     font-size: 16px;
 }
@@ -453,3 +456,4 @@ body {
         font-size: 29px;
     }
 }
+.ngo-phone-number { display: block; margin-top: 10px; color: #6f472d; font-weight: 700; text-align: center; }

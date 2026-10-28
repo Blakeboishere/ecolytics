@@ -11,4 +11,6 @@ public interface RemnantEntryRepository extends JpaRepository<RemnantEntry, Long
     List<RemnantEntry> findAllByRemnantTypeAndDonationExpiresAtLessThanEqual(String remnantType, java.time.Instant time);
 
     List<RemnantEntry> findAllByRemnantTypeAndDonationExpiresAtIsNull(String remnantType);
+
+    List<RemnantEntry> findAllByRemnantTypeAndDonationExpiresAtGreaterThanOrderByDonationExpiresAtAsc(String remnantType, java.time.Instant time);
 }

@@ -47,6 +47,12 @@ public class RemnantEntry {
     @Column(name = "donation_expires_at")
     private Instant donationExpiresAt;
 
+    @Column(name = "claimant_email", length = 254)
+    private String claimantEmail;
+
+    @Column(name = "claim_accepted")
+    private Boolean claimAccepted;
+
     protected RemnantEntry() {
     }
 
@@ -120,5 +126,10 @@ public class RemnantEntry {
     public Instant getDonationExpiresAt() {
         return donationExpiresAt;
     }
+
+    public String getClaimantEmail() { return claimantEmail; }
+    public Boolean getClaimAccepted() { return Boolean.TRUE.equals(claimAccepted); }
+    public void claim(String email) { claimantEmail = email; claimAccepted = false; }
+    public void acceptClaim() { claimAccepted = true; }
 
 }

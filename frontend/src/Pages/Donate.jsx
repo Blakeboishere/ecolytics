@@ -4,34 +4,20 @@ import "../Style/Donation.css";
 import {SectionTitle} from "../Components/SectionTitle";
 import {StepCard} from "../Components/StepCard";
 import {NGOCard} from "../Components/NGOCard";
+import { useEffect, useState } from 'react';
 
-export const Donate = () => {
-
-    const ngos = [
-        {
-            category: "FOOD DISTRIBUTION",
-            name: "Helping Hands Foundation",
-            description:
-                "Works to provide nutritious meals and essential food supplies to underprivileged communities.",
-            location: "Mumbai"
-        },
-
-        {
-            category: "HUNGER RELIEF",
-            name: "Annadaan Initiative",
-            description:
-                "Connects surplus food with communities and individuals facing food insecurity.",
-            location: "Thane"
-        },
-
-        {
-            category: "COMMUNITY SUPPORT",
-            name: "Food For All Trust",
-            description:
-                "Supports local communities by collecting and redistributing safe surplus food.",
-            location: "Navi Mumbai"
-        }
-    ];
+export const Donate = ({ account }) => {
+    const [ngos, setNgos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    useEffect(() => {
+        fetch('/api/auth/nearby-ngos')
+            .then(async (response) => {
+                if (!response.ok) throw new Error('Could not load NGOs in your area. Please refresh.');
+                return response.json();
+            })
+            .then(setNgos).catch((requestError) => setError(requestError.message)).finally(() => setLoading(false));
+    }, []);
 
 
     return (
@@ -173,19 +159,26 @@ export const Donate = () => {
                 <SectionTitle
                     className="section-heading"
                     label="OUR PARTNERS"
-                    title="Support a Trusted NGO"
-                    description="Choose an NGO and make a contribution to help fight hunger and reduce food waste."
+                    title="NGOs in Your Area"
+                    description={`NGOs near ${account?.location || 'your canteen location'} that you can contact to coordinate food donations.`}
                 />
 
 
                 <div className="ngo-container">
-
+                    {loading && <p role="status">Finding NGOs in your area…</p>}
+                    {error && <p role="alert">{error}</p>}
                     {ngos.map((ngo) => (
                         <NGOCard
-                            key={ngo.name}
-                            {...ngo}
+                            key={ngo.email}
+                            category="LOCAL FOOD RELIEF"
+                            name={ngo.name || 'Community NGO'}
+                            description="Contact this organization to coordinate surplus food donations."
+                            location={ngo.location}
+                            phone={ngo.phone}
+                            email={ngo.email}
                         />
                     ))}
+                    {!loading && !error && ngos.length === 0 && <p>No NGOs are listed in your area yet. Add or update your location in your profile so we can match nearby organizations.</p>}
 
                 </div>
 

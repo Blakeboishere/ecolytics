@@ -22,6 +22,8 @@ export const WasteDetails = () => {
   const [error, setError] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [acceptingId, setAcceptingId] = useState(null);
+  const [claimError, setClaimError] = useState('');
   const [now, setNow] = useState(0);
   useEffect(() => {
     let active = true;
@@ -88,6 +90,16 @@ export const WasteDetails = () => {
       setDeletingId(null);
     }
   };
+  const acceptClaim = async (id) => {
+    setAcceptingId(id); setClaimError('');
+    try {
+      const response = await fetch(`/api/remnants/${id}/accept-claim`, { method: 'POST' });
+      if (!response.ok) throw new Error('Could not accept this claim. Refresh and try again.');
+      const updated = await response.json();
+      setEntries((current) => current.map((entry) => entry.id === id ? updated : entry));
+    } catch (requestError) { setClaimError(requestError.message); }
+    finally { setAcceptingId(null); }
+  };
   return (
     <main className="data-page">
       <header className="data-page-header">
@@ -102,13 +114,14 @@ export const WasteDetails = () => {
         <Charts entries={visibleEntries} category={title} />
         {deleteError && <p className="data-feedback" role="alert">{deleteError}</p>}
         <section className="data-table-card" aria-label={`${title} remnant entries`}>
+          {claimError && <p className="data-feedback" role="alert">{claimError}</p>}
           <div className="data-table-summary">
             <span>{visibleEntries.length} {visibleEntries.length === 1 ? 'entry' : 'entries'}</span>
             <strong>{total.toFixed(2)} kg</strong>
           </div>
           <div className="data-table-scroll">
             <table className="data-table">
-              <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Meal</th><th>Weight</th><th>Recorded</th><th>Donation window</th><th>Update</th><th>Delete</th></tr></thead>
+              <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Meal</th><th>Weight</th><th>Recorded</th><th>Donation window</th><th>Claim</th><th>Update</th><th>Delete</th></tr></thead>
               <tbody>
                 {visibleEntries.map((entry) => (
                   <tr key={entry.id}>
@@ -125,11 +138,12 @@ export const WasteDetails = () => {
                           : <span className="donation-timer" aria-label={`${formatCountdown(entry.donationExpiresAt, now)} remaining`}>{formatCountdown(entry.donationExpiresAt, now)}</span>
                         : <span>Preparing timer…</span>
                     ) : '—'}</td>
+                    <td className="claim-cell">{entry.claimAccepted ? <span className="claim-accepted">Accepted</span> : (entry.remnantType === 'food' || entry.category === 'biodegradable') ? <button type="button" className="tableBtn claim-action" disabled={!entry.claimantEmail || acceptingId === entry.id} title={entry.claimantEmail ? 'Accept this NGO claim' : 'Waiting for an NGO to claim this entry'} onClick={() => acceptClaim(entry.id)}>{acceptingId === entry.id ? 'Accepting…' : 'Accept'}</button> : '—'}</td>
                     <td><button type="button" className="tableBtn" aria-label={`Edit ${entry.itemName}`} title="Edit entry" onClick={() => navigate(`/update/${entry.id}`)}>✏️</button></td>
                     <td><button type="button" className="tableBtn" aria-label={`Delete ${entry.itemName}`} title="Delete entry" disabled={deletingId === entry.id} onClick={() => deleteWaste(entry.id)}>{deletingId === entry.id ? '⏳' : '🗑️'}</button></td>
                   </tr>
                 ))}
-                {visibleEntries.length === 0 && <tr><td className="data-table-empty" colSpan="9">No matching entries yet. Add a remnant entry to see it here.</td></tr>}
+                {visibleEntries.length === 0 && <tr><td className="data-table-empty" colSpan="10">No matching entries yet. Add a remnant entry to see it here.</td></tr>}
               </tbody>
             </table>
           </div>

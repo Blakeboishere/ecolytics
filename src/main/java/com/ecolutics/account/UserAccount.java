@@ -33,6 +33,9 @@ public class UserAccount {
     @Column(length = 120)
     private String location;
 
+    @Column(name = "account_type", length = 16)
+    private String accountType;
+
     // Nullable to let Hibernate add this field to existing project databases without losing rows.
     @Column(name = "created_at")
     private Instant createdAt;
@@ -94,6 +97,9 @@ public class UserAccount {
     public String getLocation() {
         return location;
     }
+
+    public String getAccountType() { return accountType; }
+    public void setAccountType(String accountType) { this.accountType = accountType; }
 
     public Instant getCreatedAt() {
         return createdAt;
